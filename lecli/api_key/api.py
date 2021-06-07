@@ -59,7 +59,7 @@ def get(api_key_id):
         response = requests.get(url, headers=headers)
         handle_api_key_response(response)
     except requests.exceptions.RequestException as error:
-        sys.stderr.write(error)
+        sys.stderr.write(str(error))
         sys.exit(1)
 
 
@@ -74,7 +74,7 @@ def get_all(owner=False):
         response = requests.get(url, headers=headers)
         handle_api_key_response(response)
     except requests.exceptions.RequestException as error:
-        sys.stderr.write(error)
+        sys.stderr.write(str(error))
         sys.exit(1)
 
 
@@ -95,7 +95,7 @@ def create(payload):
         elif response.status_code == 201:
             handle_api_key_response(response)
     except requests.exceptions.RequestException as error:
-        sys.stderr.write(error)
+        sys.stderr.write(str(error))
         sys.exit(1)
 
 
@@ -124,5 +124,5 @@ def update(api_key_id, active):
                              ('Enabled' if active else 'Disabled', api_key_id))
             handle_api_key_response(response)
     except requests.exceptions.RequestException as error:
-        sys.stderr.write(error)
+        sys.stderr.write(str(error))
         sys.exit(1)

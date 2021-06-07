@@ -94,7 +94,7 @@ def test_prettyprint_statistics_groups(capsys):
 
     out, err = capsys.readouterr()
     for group in response.json()['statistics']['groups']:
-        for key, value in group.iteritems():
+        for key, value in group.items():
             assert key in out
 
     teardown_httpretty()

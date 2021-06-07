@@ -15,7 +15,7 @@ MOCK_API_URL = 'http://mydummylink.com'
 @patch('lecli.api_key.api._url')
 def test_get_api_keys(mocked_url, mocked_rw_apikey, mocked_account_resource_id, capsys):
     mocked_url.return_value = '', MOCK_API_URL
-    mocked_rw_apikey.return_value = uuid.uuid4()
+    mocked_rw_apikey.return_value = str(uuid.uuid4())
     mocked_account_resource_id.return_value = str(uuid.uuid4())
     httpretty.register_uri(httpretty.GET, MOCK_API_URL,
                            status=200,
@@ -36,7 +36,7 @@ def test_get_api_keys(mocked_url, mocked_rw_apikey, mocked_account_resource_id, 
 def test_get_api_key(mocked_url, mocked_rw_apikey, mocked_account_resource_id, capsys):
     api_key_id = str(uuid.uuid4())
     mocked_url.return_value = '', MOCK_API_URL + '/' + api_key_id
-    mocked_rw_apikey.return_value = uuid.uuid4()
+    mocked_rw_apikey.return_value = str(uuid.uuid4())
     mocked_account_resource_id.return_value = str(uuid.uuid4())
     httpretty.register_uri(httpretty.GET, MOCK_API_URL + '/' + api_key_id,
                            status=200,
@@ -114,7 +114,7 @@ def test_disable_api_key(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id
     api.update(api_key_id, False)
 
     out, err = capsys.readouterr()
-    assert {'apikey': {'active': False}} == json.loads(httpretty.last_request().body)
+    assert {'apikey': {'active': False}} == json.loads(httpretty.last_request().body.decode('utf8'))
     assert not err
     assert 'Disabled api key with id: %s' % api_key_id in out
 
@@ -139,6 +139,6 @@ def test_enable_api_key(mocked_url, mocked_owner_apikey, mocked_owner_apikey_id,
     api.update(api_key_id, True)
 
     out, err = capsys.readouterr()
-    assert {'apikey': {'active': True}} == json.loads(httpretty.last_request().body)
+    assert {'apikey': {'active': True}} == json.loads(httpretty.last_request().body.decode('utf8'))
     assert not err
     assert 'Enabled api key with id: %s' % api_key_id in out

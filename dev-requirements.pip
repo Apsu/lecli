@@ -1,13 +1,13 @@
-mock==1.0.1
-httpretty==0.8.14
-pytest==2.9.1
-pytest-cov==2.2.1
-click==6.6
-requests==2.9.1
-pytz==2016.4
-termcolor==1.1.0
-tabulate==0.7.5
-appdirs==1.4.0
-pylint==1.6.4
-validators==0.11.2
-
+mock==3.0.5 # py3.5
+httpretty
+importlib_metadata==2.1.1 # pytest compat
+pytest==6.1.2 # py3.5
+pytest-cov
+click==7.1.2 # py3.5
+requests
+pytz
+termcolor
+tabulate
+appdirs
+pylint
+validators

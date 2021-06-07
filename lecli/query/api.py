@@ -1,7 +1,7 @@
 """
 Query API module.
 """
-from __future__ import division
+
 
 import json
 import sys
@@ -291,27 +291,28 @@ def prettyprint_statistics(response):
     # Handle timeseries
     if len(data['statistics']['timeseries']) != 0:
         # Extract keys
-        stats_key = data['statistics']['stats'].keys()[0]
+        stats_key = next(iter(data['statistics']['stats'].keys()))
         stats_calc_value = data['statistics']['stats'].get(stats_key).values()
-        total = stats_calc_value[0] if len(stats_calc_value) != 0 else 0
+        total = next(iter(stats_calc_value)) if len(stats_calc_value) > 0 else 0
+
         click.echo('Total: %s' % total)
 
         click.echo('Timeseries: ')
-        timeseries_key = data['statistics']['timeseries'].keys()[0]
+        timeseries_key = next(iter(data['statistics']['timeseries'].keys()))
         time_range = time_to - time_from
         num_timeseries_values = len(data['statistics']['timeseries'].get(timeseries_key))
         for index, value in enumerate(data['statistics']['timeseries'].get(timeseries_key)):
             timestamp = (time_from + (time_range / num_timeseries_values) * (index + 1)) / 1000
             time_value = datetime.datetime.fromtimestamp(timestamp)
             human_ts = time_value.strftime('%Y-%m-%d %H:%M:%S')
-            click.echo(human_ts + ': ' + str(value.values()[0]))
+            click.echo(human_ts + ': ' + str(next(iter(value.values()))))
 
     # Handle Groups
     elif len(data['statistics']['groups']) != 0:
         for group in data['statistics']['groups']:
-            for key, value in group.iteritems():
+            for key, value in group.items():
                 click.echo(str(key) + ':')
-                for innerkey, innervalue in value.iteritems():
+                for innerkey, innervalue in value.items():
                     click.echo('\t' + str(innerkey) + ': ' + str(innervalue))
 
     else:

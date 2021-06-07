@@ -17,7 +17,7 @@ def response_error(response):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError as error:
-        sys.stderr.write("\nRequest Error:\t %s" % error.message)
+        sys.stderr.write("\nRequest Error:\t %s" % str(error))
         try:
             sys.stderr.write("\nError code:\t %s" % response.json()['errorCode'])
             sys.stderr.write("\nError message:\t %s " % response.json()['message'])

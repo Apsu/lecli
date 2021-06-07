@@ -149,7 +149,7 @@ def test_patch_saved_query_none_fields(mocked_url, mocked_rw_apikey, mocked_acco
     out, err = capsys.readouterr()
 
     assert "Saved query with id %s updated" % test_saved_query_id in out
-    body = json.loads(httpretty.last_request().body)['saved_query']
+    body = json.loads(httpretty.last_request().body.decode('utf8'))['saved_query']
     assert "name" not in body
     assert "statement" in body['leql']
 

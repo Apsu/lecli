@@ -2,7 +2,7 @@
 Configuration and api keys util module.
 """
 import sys
-import ConfigParser
+import configparser
 import base64
 import hashlib
 import hmac
@@ -21,7 +21,7 @@ AUTH_SECTION = 'Auth'
 URL_SECTION = 'Url'
 LOGGROUPS_SECTION = 'LogGroups'
 CLI_FAVORITES_SECTION = 'Cli_Favorites'
-CONFIG = ConfigParser.ConfigParser()
+CONFIG = configparser.ConfigParser()
 CONFIG_FILE_PATH = os.path.join(user_config_dir(lecli.__name__), 'config.ini')
 DEFAULT_API_URL = 'https://rest.logentries.com'
 
@@ -55,7 +55,7 @@ def init_config():
         if not os.path.exists(config_dir):
             os.makedirs(config_dir)
 
-        dummy_config = ConfigParser.ConfigParser()
+        dummy_config = configparser.ConfigParser()
         config_file = open(CONFIG_FILE_PATH, 'w')
         dummy_config.add_section(AUTH_SECTION)
         dummy_config.set(AUTH_SECTION, 'account_resource_id', '')
@@ -106,7 +106,7 @@ def replace_loggroup_section():
     if not CONFIG.has_section(CLI_FAVORITES_SECTION):
         CONFIG.add_section(CLI_FAVORITES_SECTION)
     for group in existing_groups:
-        CONFIG.set(CLI_FAVORITES_SECTION, group[0], group[1])
+        CONFIG.set(CLI_FAVORITES_SECTION, str(group[0]), str(group[1])) # Coerce Nonetype to str
     CONFIG.remove_section(LOGGROUPS_SECTION)
     config_file = open(CONFIG_FILE_PATH, 'w')
     CONFIG.write(config_file)
@@ -125,7 +125,7 @@ def get_ro_apikey():
             return get_rw_apikey()
         else:
             return ro_api_key
-    except ConfigParser.NoOptionError:
+    except configparser.NoOptionError:
         # because read-write api key is a superset of read-only api key
         return get_rw_apikey()
 
@@ -143,7 +143,7 @@ def get_rw_apikey():
                                         rw_api_key)
         else:
             return rw_api_key
-    except ConfigParser.NoOptionError:
+    except configparser.NoOptionError:
         print_config_error_and_exit(AUTH_SECTION, 'Read/Write API key(%s)' % config_key)
 
 
@@ -161,7 +161,7 @@ def get_owner_apikey():
             return
         else:
             return owner_api_key
-    except ConfigParser.NoOptionError:
+    except configparser.NoOptionError:
         print_config_error_and_exit(AUTH_SECTION, 'Owner API key(%s)' % config_key)
 
 
@@ -179,7 +179,7 @@ def get_owner_apikey_id():
             return
         else:
             return owner_apikey_id
-    except ConfigParser.NoOptionError:
+    except configparser.NoOptionError:
         print_config_error_and_exit(AUTH_SECTION, 'Owner API key ID(%s)' % config_key)
 
 
@@ -197,7 +197,7 @@ def get_account_resource_id():
             return
         else:
             return account_resource_id
-    except ConfigParser.NoOptionError:
+    except configparser.NoOptionError:
         print_config_error_and_exit(AUTH_SECTION, 'Account Resource ID(%s)' % config_key)
 
 
@@ -220,7 +220,7 @@ def get_named_logkey_group(name):
             return logkeys
         else:
             print_config_error_and_exit(section, 'Named Logkey Group(%s)' % name)
-    except ConfigParser.NoSectionError:
+    except configparser.NoSectionError:
         print_config_error_and_exit(section)
 
 
@@ -261,11 +261,11 @@ def gensignature(api_key, date, content_type, request_method, query_path, reques
     Generate owner access signature.
 
     """
-    hashed_body = base64.b64encode(hashlib.sha256(request_body).digest())
-    canonical_string = request_method + content_type + date + query_path + hashed_body
+    hashed_body = base64.b64encode(hashlib.sha256(request_body.encode('utf8')).digest())
+    canonical_string = (request_method + content_type + date + query_path).encode('utf8') + hashed_body
 
     # Create a new hmac digester with the api key as the signing key and sha1 as the algorithm
-    digest = hmac.new(api_key, digestmod=hashlib.sha1)
+    digest = hmac.new(api_key.encode('utf8'), digestmod=hashlib.sha1)
     digest.update(canonical_string)
 
     return digest.digest()
@@ -282,7 +282,7 @@ def get_api_url():
             return url
         else:
             print_config_error_and_exit(URL_SECTION, 'REST API URL(%s)' % config_key)
-    except (ConfigParser.NoOptionError, ConfigParser.NoSectionError):
+    except (configparser.NoOptionError, configparser.NoSectionError):
         return DEFAULT_API_URL
 
 
@@ -300,7 +300,7 @@ def pretty_print_string_as_json(text):
     """
     Pretty prints a json string
     """
-    print json.dumps(json.loads(text), indent=4, sort_keys=True)
+    print(json.dumps(json.loads(text), indent=4, sort_keys=True))
 
 
 def combine_objects(left, right):
@@ -309,12 +309,12 @@ def combine_objects(left, right):
     """
     if isinstance(left, dict) and isinstance(right, dict):
         result = {}
-        for key, value in left.iteritems():
+        for key, value in left.items():
             if key not in right:
                 result[key] = value
             else:
                 result[key] = combine_objects(value, right[key])
-        for key, value in right.iteritems():
+        for key, value in right.items():
             if key not in left:
                 result[key] = value
         return result

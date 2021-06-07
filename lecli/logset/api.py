@@ -114,7 +114,7 @@ def rename_logset(logset_id, logset_name):
             params['logset']['name'] = logset_name
             replace_logset(logset_id, params)
     except requests.exceptions.RequestException as error:
-        sys.stderr.write(error)
+        sys.stderr.write(str(error))
         sys.exit(1)
 
 
@@ -128,7 +128,7 @@ def replace_logset(logset_id, params):
         response = requests.put(_url((logset_id,))[1], json=params, headers=headers)
         handle_response(response, 'Update logset with details %s failed.\n' % params, 200)
     except requests.exceptions.RequestException as error:
-        sys.stderr.write(error)
+        sys.stderr.write(str(error))
         sys.exit(1)
 
 
@@ -155,7 +155,7 @@ def add_log(logset_id, log_id):
             existing_logset = response.json()
             replace_logset(logset_id, api_utils.combine_objects(existing_logset, params))
     except requests.exceptions.RequestException as error:
-        sys.stderr.write(error)
+        sys.stderr.write(str(error))
         sys.exit(1)
 
 
@@ -190,7 +190,7 @@ def get_log_keys_from_logset(logset_id):
                 for log in existing_logset['logset']['logs_info']:
                     log_ids.append(log['id'])
     except requests.exceptions.RequestException as error:
-        sys.stderr.write(error)
+        sys.stderr.write(str(error))
         sys.exit(1)
 
     if log_ids is not []:
@@ -216,7 +216,7 @@ def delete_log(logset_id, log_id):
             params = extract_log_from_logset(existing_logset, log_id)
             replace_logset(logset_id, params)
     except requests.exceptions.RequestException as error:
-        sys.stderr.write(error)
+        sys.stderr.write(str(error))
         sys.exit(1)
 
 
@@ -228,5 +228,5 @@ def replace_logset_from_file(logset_id, filename):
             params = json.load(json_data)
             replace_logset(logset_id, params)
         except ValueError as error:
-            sys.stderr.write(error.message + '\n')
+            sys.stderr.write(str(error) + '\n')
             sys.exit(1)
